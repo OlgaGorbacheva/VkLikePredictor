@@ -26,8 +26,11 @@ def get_user_info(access_token, user_id, photo_filename):
 		the_page = response.read()
 		encoding = response.info().get_content_charset('utf-8')
 		res = json.loads(the_page.decode(encoding))
-		urllib.request.urlretrieve(res['response'][0]['crop_photo']['photo']['photo_130'], photo_filename)
-		return res
+		if res['response'][0]['has_photo']:
+			urllib.request.urlretrieve(res['response'][0]['crop_photo']['photo']['photo_130'], photo_filename)
+			return res
+		else:
+			return None
 
 def main():
 	access_token = get_token()
