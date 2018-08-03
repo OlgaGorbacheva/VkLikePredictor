@@ -6,7 +6,7 @@ import logging
 import urllib.request
 import urllib.parse
 
-logging.basicConfig(filename='collectingdata.log',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s:%(message)s',level=logging.INFO)
 
 def get_token(
     token_file_name='/home/common_swift/programming/likepredictor/access_token'
@@ -49,7 +49,7 @@ def get_user_info(access_token, user_id, photo_filename):
         access_token
     )
     res = res[0]
-    if res['has_photo']:
+    if res['has_photo'] and 'crop_photo' in res:
         urllib.request.urlretrieve(
             res['crop_photo']['photo']['src_small'], 
             photo_filename
@@ -74,12 +74,13 @@ def get_photo_info(access_token, photo_id):
     res = res[0]
     return res
 
-def get_group_users(access_token, group_id, count=1000):
+def get_group_users(access_token, group_id, count=1000, offset=0):
     res = exec(
         'groups.getMembers',
         {
             'group_id': group_id,
-            'count': count
+            'count': count,
+            'offset': offset
         },
         access_token
     )
