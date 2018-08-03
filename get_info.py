@@ -33,10 +33,10 @@ def get_user_info(access_token, user_id, photo_filename):
         else:
             return None
 
-def get_photo_info(access_token, photo_id):
+def get_photo_info(access_token, photo_ids):
     values = {
         'access_token':access_token,
-        'photos': photo_id,
+        'photos': photo_ids,
         'v':version,
         'extended': '1',
     }
@@ -53,11 +53,12 @@ def main():
     access_token = get_token()
     user_info = get_user_info(access_token, '22164718', './photos/22164718')
     print(user_info)
-    photo_info = get_photo_info(
-        access_token, 
-        user_info['response'][0]['photo_id']
-    )
-    print(photo_info)
+    if user_info is not None:
+        photo_info = get_photo_info(
+            access_token, 
+            ','.join(['208289646_456239162', user_info['response'][0]['photo_id']])
+        )
+        print(photo_info)
 
 if __name__ == '__main__':
     main()
