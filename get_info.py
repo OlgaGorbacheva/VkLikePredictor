@@ -1,4 +1,5 @@
 import json
+import time
 
 import urllib.request
 import urllib.parse
@@ -18,6 +19,9 @@ def exec(method, values, access_token):
         the_page = response.read()
         encoding = response.info().get_content_charset('utf-8')
         res = json.loads(the_page.decode(encoding))
+        if 'error' in res:
+        	print(res['error']['error_msg'])
+        	raise 
         return res['response']
 
 def get_user_info(access_token, user_id, photo_filename):
@@ -60,18 +64,10 @@ def get_group_users(access_token, group_id, count=1000):
     return res['users']
 
 def compound_info(user_info, photo_info):
-	info = {}
+	counters = ['user_photos', 'videos', 'pages', 'groups', 'gifts', 'followers', 'photos', 'friends', 'audios']
+	info = {c: user_info['counters'][c] if c in user_info['counters'] else None for c in counters}
 	info['uid'] = user_info['uid']
 	info['sex'] = user_info['sex']
-	info['user_photos'] = user_info['counters']['user_photos']
-	info['videos'] = user_info['counters']['videos']
-	info['pages'] = user_info['counters']['pages']
-	info['groups'] = user_info['counters']['groups']
-	info['gifts'] = user_info['counters']['gifts']
-	info['followers'] = user_info['counters']['followers']
-	info['photos'] = user_info['counters']['photos']
-	info['friends'] = user_info['counters']['friends']
-	info['audios'] = user_info['counters']['audios']
 	info['likes'] = photo_info['likes']['count']
 	info['timestamp'] = photo_info['created']
 	return info
@@ -86,17 +82,22 @@ def get_full_user_info(access_token, user_id):
 def get_df(access_token, user_id_list):
 	data = []
 	for uid in user_id_list:
+		print(uid)
 		info = get_full_user_info(access_token, uid)
 		if info is not None:
 			data.append(info)
+		time.sleep(1)
 	print(data)
 
 def main():
     access_token = get_token()
     group_id = '34215577'
     group_members = get_group_users(access_token, group_id, 5)
-    # print(group_members)
+    print(group_members)
     get_df(access_token, group_members)
+    # uid = '176'
+    # info = get_user_info(access_token, uid, 'aa')
+    # print(info)
 
 if __name__ == '__main__':
     main()
